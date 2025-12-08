@@ -1,3 +1,154 @@
+# Aplikacja do nauki teorii prawa jazdy
+
+*[English version below](#driving-test-practice-application)*
+
+---
+
+Lokalna aplikacja webowa do nauki pytań z egzaminu teoretycznego na prawo jazdy (kategoria B). Zawiera pytania z czasomierzem, zapisywanie postępów, tryby nauki.
+
+## Funkcje
+
+- **Filtrowanie kategorii B**: Automatycznie filtruje pytania dla kategorii B
+- **Czasomierz 40 sekund**: Zgodny z czasem na prawdziwym egzaminie, z wizualnymi ostrzeżeniami
+- **Liczniki wyników**: Poprawne/błędne odpowiedzi, procent skuteczności, średni czas na pytanie
+- **Zapis postępów**: Postępy zapisywane w localStorage, przetrwają odświeżenie przeglądarki
+- **Flagowanie pytań**: Oznacz trudne pytania do późniejszej powtórki
+- **Tryby nauki**: Losowy, oflagowane pytania, powtórka błędnych odpowiedzi
+- **Tryb ciemny**: Przełączanie między jasnym a ciemnym motywem
+- **Podsumowanie sesji**: Szczegółowe statystyki i przegląd błędnych odpowiedzi
+
+## Wymagania
+
+- Python 3.x (do lokalnego serwera HTTP)
+- Nowoczesna przeglądarka (Chrome, Firefox, Edge, Safari)
+- Baza pytań i pliki multimedialne (patrz Konfiguracja zawartości poniżej)
+
+## Szybki start
+
+### Windows
+1. Wykonaj kroki z sekcji Konfiguracja zawartości (poniżej)
+2. Kliknij dwukrotnie `start_app.bat`
+3. Aplikacja otworzy się automatycznie w przeglądarce
+
+### Ręczne uruchomienie
+1. Wykonaj kroki z sekcji Konfiguracja zawartości (poniżej)
+2. Otwórz terminal w folderze projektu
+3. Uruchom: `python start_app.py`
+4. Otwórz przeglądarkę na `http://localhost:8000`
+
+## Konfiguracja zawartości
+
+Ta aplikacja wymaga oficjalnej bazy pytań egzaminacyjnych i plików multimedialnych, które nie są dołączone do tego repozytorium z powodu ograniczeń licencyjnych.
+
+### Krok 1: Pobierz oficjalne materiały
+
+1. Odwiedź oficjalną stronę Ministerstwa Infrastruktury:
+   https://www.gov.pl/web/infrastruktura/prawo-jazdy
+2. Przewiń do sekcji "Pytania egzaminacyjne na prawo jazdy"
+3. Pobierz plik Excel (`pytania_egzaminacyjne_na_kierowce_2025.xlsx`)
+
+### Krok 2: Przygotuj bazę pytań
+
+1. Otwórz pobrany plik Excel
+2. Eksportuj/Zapisz jako CSV z kodowaniem UTF-8
+3. Nazwij plik `pytania.csv` i umieść w głównym folderze projektu
+
+### Krok 3: Przygotuj pliki multimedialne
+
+1. Pobierz pliki multimedialne (obrazy i filmy) z oficjalnego źródła
+2. Utwórz folder `wizualizacje/` w głównym folderze projektu
+3. Umieść wszystkie pliki multimedialne w tym folderze
+4. Jeśli filmy nie odtwarzają się w przeglądarce, upewnij się że są w formacie `.mp4` (zalecany kodek H.264)
+
+### Struktura plików po konfiguracji
+
+```
+prawko/
+  index.html
+  start_app.py
+  start_app.bat
+  README.md
+  LICENSE
+  pytania.csv          <- Dodajesz sam
+  wizualizacje/        <- Dodajesz ten folder
+    obraz1.jpg
+    film1.mp4
+    ...
+```
+
+## Użytkowanie
+
+### Przyciski
+
+| Przycisk | Funkcja |
+|----------|---------|
+| Sprawdź | Sprawdź odpowiedź |
+| Następne | Przejdź do następnego pytania |
+| Poprzednie | Wróć do poprzedniego pytania |
+| Ikona pauzy | Wstrzymaj/wznów czasomierz |
+| Ikona flagi | Oznacz pytanie do powtórki |
+| Ikona motywu | Przełącz tryb jasny/ciemny |
+
+### Tryby nauki
+
+- **Tryb normalny**: Losowe pytania z kategorii B
+- **Tryb oflagowanych**: Tylko pytania które oznaczyłeś flagą
+- **Tryb błędnych odpowiedzi**: Powtórka pytań na które odpowiedziałeś błędnie
+
+### Zarządzanie sesją
+
+- **Zakończ sesję i pokaż statystyki**: Wyświetl podsumowanie sesji ze szczegółami błędnych odpowiedzi
+- **Zresetuj sesję**: Wyczyść postępy i zacznij od nowa
+
+## Konfiguracja
+
+### Czas na pytanie
+
+Edytuj `index.html` i zmień stałą:
+```javascript
+const DEFAULT_TIME = 40; // sekundy
+```
+
+## Szczegóły techniczne
+
+- **Serwer**: Wbudowany serwer HTTP Pythona (port 8000)
+- **Auto-wyłączenie**: Serwer zatrzymuje się po 3 godzinach
+- **Przechowywanie**: localStorage przeglądarki do zapisu postępów
+- **Kodowanie**: UTF-8 dla poprawnej obsługi polskich znaków
+
+## Rozwiązywanie problemów
+
+### "pytania.csv not found"
+Upewnij się, że wykonałeś kroki z sekcji Konfiguracja zawartości.
+
+### Filmy się nie odtwarzają
+- Sprawdź czy pliki są w formacie `.mp4`
+- Sprawdź czy nazwy plików w CSV odpowiadają rzeczywistym plikom
+- Spróbuj przekonwertować filmy do formatu MP4 H.264
+
+### "Port 8000 already in use"
+Zamknij inne aplikacje używające tego portu lub zmień PORT w `start_app.py`.
+
+### Polskie znaki wyświetlają się niepoprawnie
+Upewnij się, że `pytania.csv` jest zapisany z kodowaniem UTF-8.
+
+## Licencja
+
+Zobacz plik [LICENSE](LICENSE).
+
+- **Kod aplikacji** (HTML, CSS, JavaScript, Python): Licencja MIT
+- **Baza pytań i pliki multimedialne**: Oddzielna licencja Ministerstwa Infrastruktury (CC BY-NC-ND 3.0 PL)
+
+## Źródło materiałów
+
+Baza pytań egzaminacyjnych i powiązane pliki multimedialne są publikowane przez Ministerstwo Infrastruktury na licencji Creative Commons BY-NC-ND 3.0 PL.
+
+Źródło: https://www.gov.pl/web/infrastruktura/prawo-jazdy
+
+Materiały te są udostępnione wyłącznie do celów edukacyjnych, niekomercyjnych.
+
+---
+
 # Driving Test Practice Application
 
 A local, browser-based application for practicing Polish driving theory exam questions (category B). Features timed questions, progress tracking, session persistence, and study modes.
@@ -78,8 +229,8 @@ prawko/
 
 | Button | Function |
 |--------|----------|
-| Sprawdz | Check your answer |
-| Nastepne | Go to next question |
+| Sprawdź | Check your answer |
+| Następne | Go to next question |
 | Poprzednie | Go back to previous question |
 | Pause icon | Pause/resume timer |
 | Flag icon | Mark question for later review |
@@ -93,8 +244,8 @@ prawko/
 
 ### Session Management
 
-- **Zakoncz sesje i pokaz statystyki**: View session summary with wrong answer details
-- **Zresetuj sesje**: Clear all progress and start fresh
+- **Zakończ sesję i pokaż statystyki**: View session summary with wrong answer details
+- **Zresetuj sesję**: Clear all progress and start fresh
 
 ## Configuration
 
@@ -103,13 +254,6 @@ prawko/
 Edit `index.html` and change the constant:
 ```javascript
 const DEFAULT_TIME = 40; // seconds
-```
-
-### Target Category
-
-Edit `index.html` to change the license category filter:
-```javascript
-const TARGET_CATEGORY = 'B'; // Change to A, C, D, etc.
 ```
 
 ## Technical Details
