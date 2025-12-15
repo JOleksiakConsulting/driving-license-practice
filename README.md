@@ -13,9 +13,12 @@ Lokalna aplikacja webowa do nauki pytań z egzaminu teoretycznego na prawo jazdy
 - **Liczniki wyników**: Poprawne/błędne odpowiedzi, procent skuteczności, średni czas na pytanie
 - **Zapis postępów**: Postępy zapisywane w localStorage, przetrwają odświeżenie przeglądarki
 - **Flagowanie pytań**: Oznacz trudne pytania do późniejszej powtórki
+- **Auto-flagowanie**: Automatyczne flagowanie pytań po 2 błędnych odpowiedziach (konfigurowalne)
 - **Tryby nauki**: Losowy, oflagowane pytania, powtórka błędnych odpowiedzi
 - **Tryb ciemny**: Przełączanie między jasnym a ciemnym motywem
 - **Podsumowanie sesji**: Szczegółowe statystyki i przegląd błędnych odpowiedzi
+- **Historia nauki**: Śledzenie postępów dziennych/tygodniowych z wykresami trendów
+- **Skróty klawiszowe**: Pełna obsługa klawiatury dla szybszej nauki
 
 ## Wymagania
 
@@ -78,6 +81,18 @@ prawko/
 
 ## Użytkowanie
 
+### Skróty klawiszowe
+
+| Klawisz | Funkcja |
+|---------|---------|
+| `1` `2` `3` | Wybierz odpowiedź A/B/C |
+| `T` `N` | Wybierz Tak/Nie |
+| `Enter` / `Spacja` | Sprawdź odpowiedź / Następne pytanie |
+| `Backspace` | Poprzednie pytanie |
+| `P` | Pauza/wznów czasomierz |
+| `F` | Oznacz flagą |
+| `V` | Odtwórz/zatrzymaj wideo |
+
 ### Przyciski
 
 | Przycisk | Funkcja |
@@ -85,6 +100,7 @@ prawko/
 | Sprawdź | Sprawdź odpowiedź |
 | Następne | Przejdź do następnego pytania |
 | Poprzednie | Wróć do poprzedniego pytania |
+| Historia | Pokaż historię nauki i trendy |
 | Ikona pauzy | Wstrzymaj/wznów czasomierz |
 | Ikona flagi | Oznacz pytanie do powtórki |
 | Ikona motywu | Przełącz tryb jasny/ciemny |
@@ -109,11 +125,24 @@ Edytuj `index.html` i zmień stałą:
 const DEFAULT_TIME = 40; // sekundy
 ```
 
+### Auto-flagowanie
+
+Pytania są automatycznie flagowane po określonej liczbie błędnych odpowiedzi. Możesz to skonfigurować w `index.html`:
+```javascript
+const AUTO_FLAG_WRONG = true;  // true = włączone, false = wyłączone
+const AUTO_FLAG_THRESHOLD = 2; // liczba błędów przed auto-flagowaniem
+```
+
 ## Szczegóły techniczne
 
 - **Serwer**: Wbudowany serwer HTTP Pythona (port 8000)
 - **Auto-wyłączenie**: Serwer zatrzymuje się po 3 godzinach
-- **Przechowywanie**: localStorage przeglądarki do zapisu postępów
+- **Przechowywanie danych**: localStorage przeglądarki:
+  - `prawko_session` - postępy bieżącej sesji
+  - `prawko_flags` - oflagowane pytania
+  - `prawko_wrong_counts` - liczniki błędów (do auto-flagowania)
+  - `prawko_history` - historia nauki (ostatnie 30 dni)
+  - `prawko_theme` - preferencja motywu
 - **Kodowanie**: UTF-8 dla poprawnej obsługi polskich znaków
 
 ## Rozwiązywanie problemów
@@ -160,9 +189,12 @@ A local, browser-based application for practicing Polish driving theory exam que
 - **Score Tracking**: Correct/incorrect counts, accuracy percentage, average time per question
 - **Session Persistence**: Progress saved to localStorage, survives browser refresh
 - **Question Flagging**: Mark difficult questions for focused review later
+- **Auto-Flagging**: Automatically flags questions after 2 wrong answers (configurable)
 - **Study Modes**: Normal random mode, flagged questions mode, wrong answers review
 - **Dark Mode**: Toggle between light and dark themes
 - **Session Summary**: End session to see detailed statistics and review wrong answers
+- **Learning History**: Track daily/weekly performance with trend charts
+- **Keyboard Shortcuts**: Full keyboard navigation for faster practice
 
 ## Requirements
 
@@ -225,6 +257,18 @@ prawko/
 
 ## Usage
 
+### Keyboard Shortcuts
+
+| Key | Function |
+|-----|----------|
+| `1` `2` `3` | Select answer A/B/C |
+| `T` `N` | Select Yes/No (Tak/Nie) |
+| `Enter` / `Space` | Check answer / Next question |
+| `Backspace` | Previous question |
+| `P` | Pause/resume timer |
+| `F` | Toggle flag |
+| `V` | Play/pause video |
+
 ### Controls
 
 | Button | Function |
@@ -232,6 +276,7 @@ prawko/
 | Sprawdź | Check your answer |
 | Następne | Go to next question |
 | Poprzednie | Go back to previous question |
+| Historia | Show learning history and trends |
 | Pause icon | Pause/resume timer |
 | Flag icon | Mark question for later review |
 | Theme icon | Toggle dark/light mode |
@@ -256,11 +301,24 @@ Edit `index.html` and change the constant:
 const DEFAULT_TIME = 40; // seconds
 ```
 
+### Auto-Flagging
+
+Questions are automatically flagged after a certain number of wrong answers. Configure in `index.html`:
+```javascript
+const AUTO_FLAG_WRONG = true;  // true = enabled, false = disabled
+const AUTO_FLAG_THRESHOLD = 2; // wrong attempts before auto-flag
+```
+
 ## Technical Details
 
 - **Server**: Python's built-in HTTP server (port 8000)
 - **Auto-shutdown**: Server stops after 3 hours
-- **Storage**: Uses browser localStorage for session persistence
+- **Data Storage**: Browser localStorage with multiple keys:
+  - `prawko_session` - current session progress
+  - `prawko_flags` - flagged questions
+  - `prawko_wrong_counts` - wrong answer counts (for auto-flagging)
+  - `prawko_history` - learning history (last 30 days)
+  - `prawko_theme` - theme preference
 - **Encoding**: UTF-8 for proper Polish character support
 
 ## Troubleshooting

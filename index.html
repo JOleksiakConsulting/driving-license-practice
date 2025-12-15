@@ -424,6 +424,180 @@
             font-weight: 600;
         }
 
+        .question-number {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .auto-flag-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-yellow);
+            color: #1a1a1a;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1001;
+            animation: slideUp 0.3s ease;
+        }
+
+        .auto-flag-notification.fade-out {
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* History Modal Styles */
+        .history-stats {
+            margin-bottom: 20px;
+        }
+
+        .history-stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .history-stat-label {
+            color: var(--text-secondary);
+        }
+
+        .history-stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .history-chart {
+            margin-top: 20px;
+        }
+
+        .history-chart h4 {
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .history-day {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .history-day-date {
+            width: 90px;
+            color: var(--text-muted);
+        }
+
+        .history-day-bar-container {
+            flex: 1;
+            height: 20px;
+            background: var(--stats-bar-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 12px;
+        }
+
+        .history-day-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .history-day-value {
+            width: 60px;
+            text-align: right;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .trend-indicator.improving {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+
+        .trend-indicator.declining {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        .trend-indicator.stable {
+            background: rgba(100, 116, 139, 0.15);
+            color: var(--text-muted);
+        }
+
+        .keyboard-shortcuts {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .keyboard-shortcuts h4 {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shortcut-key {
+            background: var(--answer-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .shortcut-desc {
+            color: var(--text-muted);
+        }
+
         /* Session Summary Modal */
         .modal-overlay {
             position: fixed;
@@ -651,7 +825,10 @@
         
         <div class="content">
             <div class="question-header">
-                <div class="question" id="question"></div>
+                <div>
+                    <div class="question-number" id="questionNumber"></div>
+                    <div class="question" id="question"></div>
+                </div>
                 <button class="flag-btn" id="flagBtn" onclick="toggleFlag()" title="Oznacz do powtórki">
                     🚩
                 </button>
@@ -680,6 +857,9 @@
                 </button>
                 <button class="btn btn-warning" id="flaggedModeBtn" onclick="toggleFlaggedMode()">
                     🚩 Ucz się oflagowanych
+                </button>
+                <button class="btn btn-secondary" id="historyBtn" onclick="showHistoryModal()">
+                    📈 Historia
                 </button>
                 <button class="btn btn-end-session" id="endSessionBtn" onclick="showSessionSummary()">
                     Zakończ sesję i pokaż statystyki
@@ -745,13 +925,94 @@
         </div>
     </div>
 
+    <!-- History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>📈 Historia nauki</h2>
+                <div class="subtitle">Twoje postępy w czasie</div>
+            </div>
+            <div class="modal-body">
+                <div class="history-stats">
+                    <div class="history-stat-row">
+                        <span class="history-stat-label">Łączna liczba odpowiedzi:</span>
+                        <span class="history-stat-value" id="historyTotalAnswers">0</span>
+                    </div>
+                    <div class="history-stat-row">
+                        <span class="history-stat-label">Łączna skuteczność:</span>
+                        <span class="history-stat-value" id="historyTotalAccuracy">0%</span>
+                    </div>
+                    <div class="history-stat-row">
+                        <span class="history-stat-label">Trend:</span>
+                        <span class="history-stat-value" id="historyTrend"></span>
+                    </div>
+                </div>
+
+                <div class="history-chart">
+                    <h4>Ostatnie 7 dni</h4>
+                    <div id="historyChartContainer"></div>
+                </div>
+
+                <div class="keyboard-shortcuts">
+                    <h4>⌨️ Skróty klawiszowe</h4>
+                    <div class="shortcut-grid">
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">1</span>
+                            <span class="shortcut-key">2</span>
+                            <span class="shortcut-key">3</span>
+                            <span class="shortcut-desc">Odpowiedź A/B/C</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">T</span>
+                            <span class="shortcut-key">N</span>
+                            <span class="shortcut-desc">Tak/Nie</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Enter</span>
+                            <span class="shortcut-desc">Sprawdź/Następne</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Backspace</span>
+                            <span class="shortcut-desc">Poprzednie</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">P</span>
+                            <span class="shortcut-desc">Pauza</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">F</span>
+                            <span class="shortcut-desc">Flaga</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">V</span>
+                            <span class="shortcut-desc">Odtwórz/Zatrzymaj wideo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-actions" style="width: 100%;">
+                    <button class="btn btn-primary" onclick="closeHistoryModal()">
+                        Zamknij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Constants
         const DEFAULT_TIME = 40;
         const STORAGE_KEY = 'prawko_session';
         const THEME_KEY = 'prawko_theme';
         const FLAGS_KEY = 'prawko_flags';
+        const WRONG_COUNTS_KEY = 'prawko_wrong_counts';
+        const HISTORY_KEY = 'prawko_history';
         const TARGET_CATEGORY = 'B'; // Filter for category B
+        
+        // Auto-flag configuration
+        const AUTO_FLAG_WRONG = true;  // Enable/disable auto-flagging after repeated wrong answers
+        const AUTO_FLAG_THRESHOLD = 2; // Number of wrong attempts before auto-flag
         
         // Global variables
         let allQuestions = []; // All loaded questions
@@ -785,6 +1046,12 @@
         let flaggedMode = false;
         let wrongAnswersMode = false;
         let wrongAnswersQueue = [];
+        
+        // Wrong answer counts per question (for auto-flagging)
+        let wrongCounts = new Map();
+        
+        // Session history
+        let sessionHistory = [];
 
         // Theme management
         function initTheme() {
@@ -862,10 +1129,90 @@
             localStorage.setItem(FLAGS_KEY, JSON.stringify(Array.from(flaggedQuestions)));
         }
 
+        function loadWrongCounts() {
+            const saved = localStorage.getItem(WRONG_COUNTS_KEY);
+            if (saved) {
+                try {
+                    wrongCounts = new Map(JSON.parse(saved));
+                } catch (e) {
+                    console.error('Error loading wrong counts:', e);
+                }
+            }
+        }
+
+        function saveWrongCounts() {
+            localStorage.setItem(WRONG_COUNTS_KEY, JSON.stringify(Array.from(wrongCounts.entries())));
+        }
+
+        function loadSessionHistory() {
+            const saved = localStorage.getItem(HISTORY_KEY);
+            if (saved) {
+                try {
+                    sessionHistory = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error loading history:', e);
+                    sessionHistory = [];
+                }
+            }
+        }
+
+        function saveSessionHistory() {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(sessionHistory));
+        }
+
+        function saveToHistory() {
+            const total = correctAnswers + incorrectAnswers;
+            if (total === 0) return; // Don't save empty sessions
+            
+            const today = new Date().toISOString().split('T')[0];
+            const accuracy = Math.round((correctAnswers / total) * 100);
+            const avgTime = questionTimes.length > 0 
+                ? Math.round(questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length) 
+                : 0;
+            
+            // Find existing entry for today or create new
+            const existingIndex = sessionHistory.findIndex(s => s.date === today);
+            
+            if (existingIndex >= 0) {
+                // Update existing entry by adding stats
+                const existing = sessionHistory[existingIndex];
+                const totalPrev = existing.correct + existing.incorrect;
+                const totalNew = total;
+                const combinedTotal = totalPrev + totalNew;
+                
+                sessionHistory[existingIndex] = {
+                    date: today,
+                    correct: existing.correct + correctAnswers,
+                    incorrect: existing.incorrect + incorrectAnswers,
+                    avgTime: Math.round((existing.avgTime * totalPrev + avgTime * totalNew) / combinedTotal),
+                    sessions: (existing.sessions || 1) + 1
+                };
+            } else {
+                // Add new entry
+                sessionHistory.push({
+                    date: today,
+                    correct: correctAnswers,
+                    incorrect: incorrectAnswers,
+                    avgTime: avgTime,
+                    sessions: 1
+                });
+            }
+            
+            // Keep only last 30 days
+            sessionHistory = sessionHistory
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .slice(0, 30);
+            
+            saveSessionHistory();
+        }
+
         function resetSession() {
             if (!confirm('Czy na pewno chcesz zresetować sesję? Wszystkie postępy zostaną utracone.')) {
                 return;
             }
+            
+            // Save current session to history before reset
+            saveToHistory();
             
             correctAnswers = 0;
             incorrectAnswers = 0;
@@ -879,8 +1226,10 @@
             flaggedMode = false;
             wrongAnswersMode = false;
             wrongAnswersQueue = [];
+            wrongCounts.clear();
             
             localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(WRONG_COUNTS_KEY);
             updateScoreDisplay();
             updateModeIndicator();
             updateFlaggedModeButton();
@@ -949,8 +1298,10 @@
                 
                 console.log(`Loaded ${allQuestions.length} total questions, ${questions.length} for category B`);
                 
-                // Load saved session and flags
+                // Load saved session, flags, wrong counts, and history
                 loadFlaggedQuestions();
+                loadWrongCounts();
+                loadSessionHistory();
                 const hasSession = loadSession();
                 
                 if (hasSession && questionHistory.length > 0) {
@@ -1160,6 +1511,7 @@
 
         function displayQuestion(question) {
             document.getElementById('question').textContent = question.question;
+            document.getElementById('questionNumber').textContent = 'Pytanie #' + question.number;
             
             // Update flag button
             updateFlagButton();
@@ -1254,6 +1606,18 @@
             updateProgress();
         }
 
+        function showAutoFlagNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'auto-flag-notification';
+            notification.innerHTML = '🚩 Pytanie automatycznie oflagowane (błąd ' + AUTO_FLAG_THRESHOLD + 'x)';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
         function resetButtons() {
             const checkBtn = document.getElementById('checkBtn');
             const nextBtn = document.getElementById('nextBtn');
@@ -1304,7 +1668,7 @@
             
             const isCorrect = selectedAnswer === correctAnswerText;
             
-            // Track wrong answer details
+            // Track wrong answer details and auto-flag
             if (!isCorrect) {
                 const existingIndex = wrongAnswersDetails.findIndex(w => w.questionNumber === question.number);
                 const wrongDetail = {
@@ -1317,6 +1681,21 @@
                     wrongAnswersDetails[existingIndex] = wrongDetail;
                 } else {
                     wrongAnswersDetails.push(wrongDetail);
+                }
+                
+                // Auto-flag logic
+                if (AUTO_FLAG_WRONG) {
+                    const currentCount = (wrongCounts.get(question.number) || 0) + 1;
+                    wrongCounts.set(question.number, currentCount);
+                    saveWrongCounts();
+                    
+                    if (currentCount >= AUTO_FLAG_THRESHOLD && !flaggedQuestions.has(question.number)) {
+                        flaggedQuestions.add(question.number);
+                        saveFlaggedQuestions();
+                        updateFlagButton();
+                        // Show auto-flag notification
+                        showAutoFlagNotification();
+                    }
                 }
             } else {
                 // Remove from wrong answers if they got it right this time
@@ -1454,6 +1833,9 @@
         function showSessionSummary() {
             clearInterval(timer);
             
+            // Save to history when showing summary
+            saveToHistory();
+            
             const modal = document.getElementById('summaryModal');
             const total = correctAnswers + incorrectAnswers;
             const accuracy = total > 0 ? Math.round((correctAnswers / total) * 100) : 0;
@@ -1510,6 +1892,201 @@
         document.getElementById('summaryModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeSummaryModal();
+            }
+        });
+
+        // History Modal Functions
+        function showHistoryModal() {
+            const modal = document.getElementById('historyModal');
+            
+            // Calculate totals from history
+            let totalCorrect = 0;
+            let totalIncorrect = 0;
+            
+            sessionHistory.forEach(s => {
+                totalCorrect += s.correct;
+                totalIncorrect += s.incorrect;
+            });
+            
+            const totalAnswers = totalCorrect + totalIncorrect;
+            const totalAccuracy = totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0;
+            
+            document.getElementById('historyTotalAnswers').textContent = totalAnswers;
+            document.getElementById('historyTotalAccuracy').textContent = totalAccuracy + '%';
+            
+            // Calculate trend (compare last 3 days vs previous 3 days)
+            const trendEl = document.getElementById('historyTrend');
+            const sortedHistory = [...sessionHistory].sort((a, b) => b.date.localeCompare(a.date));
+            
+            if (sortedHistory.length >= 4) {
+                const recent = sortedHistory.slice(0, 3);
+                const previous = sortedHistory.slice(3, 6);
+                
+                const recentAcc = calculateAccuracy(recent);
+                const prevAcc = calculateAccuracy(previous);
+                const diff = recentAcc - prevAcc;
+                
+                if (diff > 3) {
+                    trendEl.innerHTML = '<span class="trend-indicator improving">↑ Poprawa (+' + diff + '%)</span>';
+                } else if (diff < -3) {
+                    trendEl.innerHTML = '<span class="trend-indicator declining">↓ Spadek (' + diff + '%)</span>';
+                } else {
+                    trendEl.innerHTML = '<span class="trend-indicator stable">→ Stabilnie</span>';
+                }
+            } else {
+                trendEl.innerHTML = '<span class="trend-indicator stable">Za mało danych</span>';
+            }
+            
+            // Render chart (last 7 days)
+            const chartContainer = document.getElementById('historyChartContainer');
+            const last7Days = sortedHistory.slice(0, 7).reverse();
+            
+            if (last7Days.length === 0) {
+                chartContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Brak danych historycznych</p>';
+            } else {
+                chartContainer.innerHTML = last7Days.map(day => {
+                    const total = day.correct + day.incorrect;
+                    const accuracy = total > 0 ? Math.round((day.correct / total) * 100) : 0;
+                    const dateStr = formatDateShort(day.date);
+                    
+                    return `
+                        <div class="history-day">
+                            <span class="history-day-date">${dateStr}</span>
+                            <div class="history-day-bar-container">
+                                <div class="history-day-bar" style="width: ${accuracy}%"></div>
+                            </div>
+                            <span class="history-day-value">${accuracy}% (${total})</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        function calculateAccuracy(sessions) {
+            let correct = 0, incorrect = 0;
+            sessions.forEach(s => {
+                correct += s.correct;
+                incorrect += s.incorrect;
+            });
+            const total = correct + incorrect;
+            return total > 0 ? Math.round((correct / total) * 100) : 0;
+        }
+
+        function formatDateShort(dateStr) {
+            const date = new Date(dateStr);
+            const days = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb'];
+            const day = days[date.getDay()];
+            return `${day} ${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+        }
+
+        // Close history modal on overlay click
+        document.getElementById('historyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHistoryModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ignore if modal is open
+            const summaryModal = document.getElementById('summaryModal');
+            const historyModal = document.getElementById('historyModal');
+            if (summaryModal.classList.contains('active') || historyModal.classList.contains('active')) {
+                if (e.key === 'Escape') {
+                    summaryModal.classList.remove('active');
+                    historyModal.classList.remove('active');
+                }
+                return;
+            }
+            
+            // Ignore if typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            const key = e.key.toLowerCase();
+            const answerButtons = document.querySelectorAll('.answer-btn');
+            
+            // Number keys for ABC answers
+            if (!isAnswered) {
+                if (key === '1' && answerButtons.length >= 1) {
+                    e.preventDefault();
+                    answerButtons[0].click();
+                } else if (key === '2' && answerButtons.length >= 2) {
+                    e.preventDefault();
+                    answerButtons[1].click();
+                } else if (key === '3' && answerButtons.length >= 3) {
+                    e.preventDefault();
+                    answerButtons[2].click();
+                }
+                
+                // T/N for Tak/Nie questions
+                if (key === 't' && answerButtons.length === 2) {
+                    e.preventDefault();
+                    // Find Tak button
+                    answerButtons.forEach(btn => {
+                        if (btn.textContent === 'Tak') btn.click();
+                    });
+                } else if (key === 'n' && answerButtons.length === 2) {
+                    e.preventDefault();
+                    // Find Nie button
+                    answerButtons.forEach(btn => {
+                        if (btn.textContent === 'Nie') btn.click();
+                    });
+                }
+            }
+            
+            // Enter/Space for check/next
+            if (key === 'enter' || key === ' ') {
+                e.preventDefault();
+                const checkBtn = document.getElementById('checkBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                
+                if (checkBtn.style.display !== 'none' && !checkBtn.disabled) {
+                    checkBtn.click();
+                } else if (nextBtn.style.display !== 'none') {
+                    nextBtn.click();
+                }
+            }
+            
+            // Backspace for previous
+            if (key === 'backspace') {
+                e.preventDefault();
+                const prevBtn = document.getElementById('prevBtn');
+                if (prevBtn.style.display !== 'none') {
+                    prevBtn.click();
+                }
+            }
+            
+            // P for pause
+            if (key === 'p') {
+                e.preventDefault();
+                togglePause();
+            }
+            
+            // F for flag
+            if (key === 'f') {
+                e.preventDefault();
+                toggleFlag();
+            }
+            
+            // V for video play/pause
+            if (key === 'v') {
+                e.preventDefault();
+                const video = document.getElementById('questionVideo');
+                if (video && video.style.display !== 'none') {
+                    if (video.paused) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
+                }
             }
         });
 
